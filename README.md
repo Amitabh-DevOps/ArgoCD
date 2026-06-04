@@ -77,6 +77,45 @@ The script automates:
 
 ---
 
+## ➕ Add Cluster to ArgoCD
+
+After the script runs, login to the CLI and register your KinD cluster with ArgoCD:
+
+**1. Login to ArgoCD CLI**
+```bash
+argocd login <EC2_PUBLIC_IP>:8080 \
+  --username admin \
+  --password <password_from_script> \
+  --insecure
+```
+
+**2. Check available kubeconfig contexts**
+```bash
+kubectl config get-contexts
+```
+
+**3. Add the cluster to ArgoCD**
+```bash
+argocd cluster add kind-argocd-cluster \
+  --name argocd-cluster \
+  --insecure
+```
+> Replace `kind-argocd-cluster` with the actual context name shown in the previous command.
+
+**4. Verify the cluster is registered**
+```bash
+argocd cluster list
+```
+
+Expected output:
+```
+SERVER                          NAME             VERSION  STATUS
+https://kubernetes.default.svc  in-cluster       v1.35    Successful
+https://<kind-ip>:33893         argocd-cluster   v1.35    Successful
+```
+
+---
+
 ## 🧪 Demo Application
 
 The `/app` directory contains a modern Node.js static web app that covers ArgoCD & GitOps concepts visually. Use it to demonstrate deployments throughout the course.
