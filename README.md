@@ -93,7 +93,7 @@ docker push <your-dockerhub>/argocd-demo:v1.0.0
 
 ## ⭐ Support
 
-If this course helped you, please **star the repo** and **subscribe to the channel** — it helps create more free content!
+If this course helped you, please **star the repo** and **subscribe to the channel** (https://www.youtube.com/@SoniAmitabh) — it helps create more free content!
 
 ---
 
