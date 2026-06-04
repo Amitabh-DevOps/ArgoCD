@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArgoCD & GitOps – Learn the Fundamentals</title>
+  <meta name="description" content="A visual guide to ArgoCD, GitOps principles, and continuous delivery for Kubernetes. Learn core concepts, workflows, and best practices." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── NAVIGATION ── -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="20" cy="20" r="18" stroke="url(#logoGrad)" stroke-width="2.5"/>
+          <path d="M13 20 C13 14 27 14 27 20 C27 26 13 26 13 20Z" fill="url(#logoGrad)" opacity="0.3"/>
+          <circle cx="20" cy="20" r="4" fill="url(#logoGrad)"/>
+          <path d="M20 8 L20 12 M20 28 L20 32 M8 20 L12 20 M28 20 L32 20" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#f96c3f"/>
+              <stop offset="100%" stop-color="#e8472a"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span>ArgoCD</span>
+      </div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#what-is-gitops">GitOps</a></li>
+        <li><a href="#argocd-intro">ArgoCD</a></li>
+        <li><a href="#principles">Principles</a></li>
+        <li><a href="#workflow">Workflow</a></li>
+        <li><a href="#concepts">Concepts</a></li>
+        <li><a href="#comparison">vs CI/CD</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <header class="hero" id="home">
+    <div class="hero-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="grid-lines"></div>
+    </div>
+    <div class="hero-content">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        GitOps for Kubernetes
+      </div>
+      <h1>
+        Declarative. Git-Driven.<br />
+        <span class="gradient-text">Continuous Delivery.</span>
+      </h1>
+      <p class="hero-sub">
+        Understand how <strong>ArgoCD</strong> automates deployments by treating
+        Git as the single source of truth — bringing reliability, auditability,
+        and speed to your Kubernetes workflows.
+      </p>
+      <div class="hero-cta">
+        <a href="#argocd-intro" class="btn-primary">Explore ArgoCD</a>
+        <a href="#workflow" class="btn-ghost">See the Workflow →</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-card" id="stat-stars">
+          <span class="stat-num">18k+</span>
+          <span class="stat-label">GitHub Stars</span>
+        </div>
+        <div class="stat-card" id="stat-adopters">
+          <span class="stat-num">CNCF</span>
+          <span class="stat-label">Graduated Project</span>
+        </div>
+        <div class="stat-card" id="stat-clusters">
+          <span class="stat-num">Git</span>
+          <span class="stat-label">Single Source of Truth</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="terminal-window">
+        <div class="terminal-bar">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-title">argocd app sync</span>
+        </div>
+        <div class="terminal-body" id="terminalBody">
+          <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">argocd app create my-app \</span></div>
+          <div class="t-line"><span class="t-indent">  --repo https://github.com/org/repo \</span></div>
+          <div class="t-line"><span class="t-indent">  --path k8s/ \</span></div>
+          <div class="t-line"><span class="t-indent">  --dest-server https://kubernetes.default.svc \</span></div>
+          <div class="t-line"><span class="t-indent">  --dest-namespace production</span></div>
+          <div class="t-line t-output"><span class="t-success">✓</span> application 'my-app' created</div>
+          <div class="t-line t-blank"></div>
+          <div class="t-line"><span class="t-prompt">$</span> <span class="t-cmd">argocd app sync my-app</span></div>
+          <div class="t-line t-output"><span class="t-info">TIMESTAMP</span>  GROUP  KIND        NAMESPACE  NAME</div>
+          <div class="t-line t-output"><span class="t-success">✓</span>  apps   Deployment  production my-app     <span class="t-tag">Synced</span></div>
+          <div class="t-line t-output"><span class="t-success">✓</span>  &nbsp;&nbsp;&nbsp;&nbsp;  Service     production my-app-svc <span class="t-tag">Synced</span></div>
+          <div class="t-line t-blink"><span class="t-prompt">$</span> <span class="cursor">▋</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── WHAT IS GITOPS ── -->
+  <section id="what-is-gitops" class="section section-dark">
+    <div class="container">
+      <div class="section-label">Foundation</div>
+      <h2 class="section-title">What is <span class="gradient-text">GitOps</span>?</h2>
+      <p class="section-sub">
+        GitOps is an operational framework that takes DevOps best practices — version control,
+        collaboration, compliance, CI/CD — and applies them to infrastructure automation.
+      </p>
+      <div class="gitops-split">
+        <div class="gitops-text">
+          <p>
+            Coined by <strong>Weaveworks</strong> in 2017, GitOps uses Git repositories as the
+            <em>single source of truth</em> for defining the desired state of your infrastructure
+            and applications. Instead of running imperative commands (<code>kubectl apply</code>),
+            you push changes to Git — and an automated operator reconciles the live system to match.
+          </p>
+          <p>
+            This means every change is <strong>versioned, auditable, and reversible</strong>.
+            Rollbacks become as simple as <code>git revert</code>.
+          </p>
+          <div class="key-idea">
+            <span class="key-icon">💡</span>
+            <blockquote>
+              "If it's not in Git, it doesn't exist."
+            </blockquote>
+          </div>
+        </div>
+        <div class="gitops-diagram">
+          <div class="diagram-node node-dev">
+            <span class="node-icon">👩‍💻</span>
+            <span>Developer</span>
+          </div>
+          <div class="diagram-arrow">git push →</div>
+          <div class="diagram-node node-git">
+            <span class="node-icon">📦</span>
+            <span>Git Repo</span>
+          </div>
+          <div class="diagram-arrow">reconcile →</div>
+          <div class="diagram-node node-k8s">
+            <span class="node-icon">☸️</span>
+            <span>Kubernetes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ARGOCD INTRO ── -->
+  <section id="argocd-intro" class="section">
+    <div class="container">
+      <div class="section-label">The Tool</div>
+      <h2 class="section-title">What is <span class="gradient-text">ArgoCD</span>?</h2>
+      <p class="section-sub">
+        ArgoCD is a declarative, GitOps continuous delivery tool for Kubernetes — a CNCF Graduated project.
+      </p>
+      <div class="card-grid">
+        <div class="info-card" id="card-declarative">
+          <div class="card-icon">📋</div>
+          <h3>Declarative Configuration</h3>
+          <p>
+            Define <em>what</em> you want, not <em>how</em> to get there.
+            ArgoCD reads your Kubernetes manifests, Helm charts, or Kustomize
+            configs from Git and ensures the cluster matches that state.
+          </p>
+        </div>
+        <div class="info-card" id="card-automated">
+          <div class="card-icon">🔄</div>
+          <h3>Automated Sync</h3>
+          <p>
+            ArgoCD continuously monitors both Git and the cluster.
+            When drift is detected — a manual change or a new commit — it
+            automatically (or on-demand) reconciles the cluster back to the
+            desired state.
+          </p>
+        </div>
+        <div class="info-card" id="card-ui">
+          <div class="card-icon">🖥️</div>
+          <h3>Rich UI & CLI</h3>
+          <p>
+            A real-time web dashboard visualises application health, sync status,
+            resource trees, and deployment history. Full CLI support for
+            automation and scripting.
+          </p>
+        </div>
+        <div class="info-card" id="card-multi">
+          <div class="card-icon">🌐</div>
+          <h3>Multi-Cluster Management</h3>
+          <p>
+            Manage deployments across many Kubernetes clusters from a single
+            ArgoCD control plane. Ideal for staging → production promotion
+            workflows.
+          </p>
+        </div>
+        <div class="info-card" id="card-rbac">
+          <div class="card-icon">🔐</div>
+          <h3>RBAC & SSO</h3>
+          <p>
+            Fine-grained role-based access control with support for OIDC,
+            GitHub, GitLab, LDAP, and SAML SSO integrations out of the box.
+          </p>
+        </div>
+        <div class="info-card" id="card-rollback">
+          <div class="card-icon">⏪</div>
+          <h3>Instant Rollback</h3>
+          <p>
+            Every deployment is tied to a Git commit. Rolling back is as
+            simple as reverting the commit or pointing ArgoCD to a previous
+            revision — no runbooks needed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PRINCIPLES ── -->
+  <section id="principles" class="section section-dark">
+    <div class="container">
+      <div class="section-label">Core GitOps Principles</div>
+      <h2 class="section-title">The <span class="gradient-text">Four Principles</span></h2>
+      <p class="section-sub">OpenGitOps (CNCF) defines four foundational principles that every GitOps implementation must follow.</p>
+      <div class="principles-list">
+        <div class="principle-item" id="principle-1">
+          <div class="principle-num">01</div>
+          <div class="principle-body">
+            <h3>Declarative</h3>
+            <p>
+              The entire system must be described declaratively. A declarative system expresses
+              the <em>desired state</em> rather than the sequence of steps to achieve it.
+              Kubernetes manifests, Helm values, and Kustomize overlays are all declarative.
+            </p>
+            <div class="principle-tag">Desired State ≠ Imperative Commands</div>
+          </div>
+        </div>
+        <div class="principle-item" id="principle-2">
+          <div class="principle-num">02</div>
+          <div class="principle-body">
+            <h3>Versioned &amp; Immutable</h3>
+            <p>
+              The desired state is stored in a way that enforces immutability and retains a
+              complete version history. Git provides this natively — every commit is a snapshot,
+              every change is audited, and nothing can be silently altered.
+            </p>
+            <div class="principle-tag">Git = Audit Log + Time Machine</div>
+          </div>
+        </div>
+        <div class="principle-item" id="principle-3">
+          <div class="principle-num">03</div>
+          <div class="principle-body">
+            <h3>Pulled Automatically</h3>
+            <p>
+              Software agents (like ArgoCD) automatically pull the desired state declarations
+              from Git and apply them to the system. This pull-based model is more secure than
+              push-based CI/CD because the cluster credentials never leave the cluster.
+            </p>
+            <div class="principle-tag">Pull &gt; Push (security wins)</div>
+          </div>
+        </div>
+        <div class="principle-item" id="principle-4">
+          <div class="principle-num">04</div>
+          <div class="principle-body">
+            <h3>Continuously Reconciled</h3>
+            <p>
+              Software agents continuously observe the actual system state and attempt to apply
+              the desired state. If someone manually edits a resource in the cluster (config drift),
+              the agent detects and corrects it automatically.
+            </p>
+            <div class="principle-tag">Drift Detection → Auto-heal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── WORKFLOW ── -->
+  <section id="workflow" class="section">
+    <div class="container">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">The ArgoCD <span class="gradient-text">Workflow</span></h2>
+      <p class="section-sub">From a code commit to a running deployment — here's how GitOps with ArgoCD works end to end.</p>
+      <div class="workflow-steps">
+        <div class="workflow-step" id="step-1">
+          <div class="step-circle">1</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>Developer Pushes Code</h3>
+            <p>A developer merges a pull request. The application source code changes are committed to the <strong>app repository</strong>.</p>
+          </div>
+        </div>
+        <div class="workflow-step" id="step-2">
+          <div class="step-circle">2</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>CI Pipeline Builds &amp; Tags Image</h3>
+            <p>A CI system (GitHub Actions, Jenkins, etc.) builds a Docker image, runs tests, and pushes the image to a container registry with a new tag.</p>
+          </div>
+        </div>
+        <div class="workflow-step" id="step-3">
+          <div class="step-circle">3</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>Config Repo Gets Updated</h3>
+            <p>The CI pipeline (or a bot) updates the image tag in the <strong>GitOps config repository</strong> — the Kubernetes manifests or Helm values file.</p>
+          </div>
+        </div>
+        <div class="workflow-step" id="step-4">
+          <div class="step-circle">4</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>ArgoCD Detects the Drift</h3>
+            <p>ArgoCD continuously polls the config repo (or uses a webhook). It detects that the live cluster state no longer matches the desired state in Git.</p>
+          </div>
+        </div>
+        <div class="workflow-step" id="step-5">
+          <div class="step-circle">5</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>ArgoCD Syncs to Cluster</h3>
+            <p>ArgoCD applies the updated manifests to the Kubernetes cluster — rolling out the new image via the Deployment object.</p>
+          </div>
+        </div>
+        <div class="workflow-step" id="step-6">
+          <div class="step-circle">6</div>
+          <div class="step-connector no-line"></div>
+          <div class="step-content">
+            <h3>Health Check &amp; Status</h3>
+            <p>ArgoCD monitors rollout health. If pods become unhealthy, it marks the app <strong>Degraded</strong> and can auto-rollback. The dashboard shows real-time status.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── KEY CONCEPTS ── -->
+  <section id="concepts" class="section section-dark">
+    <div class="container">
+      <div class="section-label">Key Concepts</div>
+      <h2 class="section-title">ArgoCD <span class="gradient-text">Concepts</span></h2>
+      <p class="section-sub">Important terms and objects you'll encounter when working with ArgoCD.</p>
+      <div class="concepts-grid">
+        <div class="concept-card" id="concept-app">
+          <div class="concept-header">
+            <code class="concept-code">Application</code>
+            <span class="concept-kind">CRD</span>
+          </div>
+          <p>The core ArgoCD custom resource. An <code>Application</code> defines the source (Git repo + path) and destination (cluster + namespace) for a deployment.</p>
+        </div>
+        <div class="concept-card" id="concept-project">
+          <div class="concept-header">
+            <code class="concept-code">AppProject</code>
+            <span class="concept-kind">CRD</span>
+          </div>
+          <p>A grouping mechanism for Applications. Projects restrict which repos and clusters an app can use, enabling multi-team isolation and governance.</p>
+        </div>
+        <div class="concept-card" id="concept-sync">
+          <div class="concept-header">
+            <code class="concept-code">Sync</code>
+            <span class="concept-kind">Operation</span>
+          </div>
+          <p>The process of making the live cluster state match the Git desired state. Can be triggered manually or set to auto-sync on every Git commit.</p>
+        </div>
+        <div class="concept-card" id="concept-health">
+          <div class="concept-header">
+            <code class="concept-code">Health Status</code>
+            <span class="concept-kind">Status</span>
+          </div>
+          <p>ArgoCD evaluates resource health: <strong>Healthy</strong>, <strong>Progressing</strong>, <strong>Degraded</strong>, <strong>Suspended</strong>, or <strong>Missing</strong>. Health checks are customisable via Lua scripts.</p>
+        </div>
+        <div class="concept-card" id="concept-repo">
+          <div class="concept-header">
+            <code class="concept-code">Repository</code>
+            <span class="concept-kind">Config</span>
+          </div>
+          <p>A Git repository registered with ArgoCD. Supports HTTPS and SSH authentication. Can be a dedicated GitOps repo separate from the app source code.</p>
+        </div>
+        <div class="concept-card" id="concept-hook">
+          <div class="concept-header">
+            <code class="concept-code">Sync Hooks</code>
+            <span class="concept-kind">Lifecycle</span>
+          </div>
+          <p>Jobs or resources that run at specific points in the sync lifecycle: <strong>PreSync</strong> (DB migrations), <strong>Sync</strong>, and <strong>PostSync</strong> (smoke tests).</p>
+        </div>
+        <div class="concept-card" id="concept-wave">
+          <div class="concept-header">
+            <code class="concept-code">Sync Waves</code>
+            <span class="concept-kind">Ordering</span>
+          </div>
+          <p>Use the <code>argocd.argoproj.io/sync-wave</code> annotation to control the order in which resources are applied. Lower wave numbers are applied first.</p>
+        </div>
+        <div class="concept-card" id="concept-appset">
+          <div class="concept-header">
+            <code class="concept-code">ApplicationSet</code>
+            <span class="concept-kind">CRD</span>
+          </div>
+          <p>Automates the creation of many Applications from a template. Uses generators (List, Git, Cluster, Matrix) to create apps for multiple environments or clusters dynamically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── COMPARISON ── -->
+  <section id="comparison" class="section">
+    <div class="container">
+      <div class="section-label">Understanding the Difference</div>
+      <h2 class="section-title">GitOps vs Traditional <span class="gradient-text">CI/CD</span></h2>
+      <p class="section-sub">ArgoCD is a CD tool — it complements your CI pipeline rather than replacing it.</p>
+      <div class="compare-table-wrap">
+        <table class="compare-table" id="compareTable">
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th class="col-gitops">GitOps / ArgoCD</th>
+              <th class="col-cicd">Traditional Push CI/CD</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Deployment model</td>
+              <td><span class="badge-green">Pull-based</span> — agent pulls from Git</td>
+              <td><span class="badge-orange">Push-based</span> — pipeline pushes to cluster</td>
+            </tr>
+            <tr>
+              <td>Cluster credentials</td>
+              <td>Credentials stay <strong>inside</strong> the cluster</td>
+              <td>Credentials stored in CI system (risk)</td>
+            </tr>
+            <tr>
+              <td>Drift detection</td>
+              <td>Continuous monitoring &amp; auto-heal</td>
+              <td>No detection after deployment</td>
+            </tr>
+            <tr>
+              <td>Rollback</td>
+              <td><code>git revert</code> — instant</td>
+              <td>Re-run pipeline with old tag</td>
+            </tr>
+            <tr>
+              <td>Audit trail</td>
+              <td>Git history is the audit log</td>
+              <td>Scattered across CI logs</td>
+            </tr>
+            <tr>
+              <td>Source of truth</td>
+              <td>Git repository</td>
+              <td>Running cluster state</td>
+            </tr>
+            <tr>
+              <td>Multi-cluster</td>
+              <td>Native support</td>
+              <td>Complex scripting required</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="footer-logo">ArgoCD Demo</span>
+          <p>A learning resource for GitOps and Kubernetes continuous delivery.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="https://argo-cd.readthedocs.io" target="_blank" rel="noopener noreferrer">Official Docs</a></li>
+            <li><a href="https://github.com/argoproj/argo-cd" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+            <li><a href="https://opengitops.dev" target="_blank" rel="noopener noreferrer">OpenGitOps Spec</a></li>
+            <li><a href="https://www.cncf.io/projects/argo/" target="_blank" rel="noopener noreferrer">CNCF Project Page</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Topics</h4>
+          <ul>
+            <li><a href="#what-is-gitops">GitOps</a></li>
+            <li><a href="#principles">4 Principles</a></li>
+            <li><a href="#workflow">Workflow</a></li>
+            <li><a href="#concepts">Key Concepts</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>Built for ArgoCD demo · GitOps-deployed · CNCF Graduated Project</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# kind-cluster.yaml
+# KinD Cluster Configuration
+# Kubernetes: v1.35.0  |  kind: v0.29.0+
+#
+# Create cluster:
+#   kind create cluster --name argocd-demo --config kind-cluster.yaml
+#
+# Delete cluster:
+#   kind delete cluster --name argocd-demo
+
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+
+nodes:
+- role: control-plane
+  image: kindest/node:v1.35.0
+- role: worker
+  image: kindest/node:v1.35.0

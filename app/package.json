@@ -1,0 +1,13 @@
+{
+  "name": "argocd-demo-app",
+  "version": "1.0.0",
+  "description": "A modern static web app for ArgoCD & GitOps demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
