@@ -10,13 +10,13 @@ Install the following tools before starting.
 
 ### 🐳 Docker Desktop
 
-Download and install from the official site:
-```
-https://www.docker.com/products/docker-desktop
-```
-Verify:
 ```bash
-docker version
+sudo apt-get update
+sudo apt install docker.io -y
+sudo usermod -aG docker $USER && newgrp docker
+docker --version
+
+docker ps
 ```
 
 ---
