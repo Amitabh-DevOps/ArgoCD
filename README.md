@@ -13,10 +13,10 @@
 
 | # | Module | Status |
 |---|--------|--------|
-| 01 | Intro to GitOps & ArgoCD | 📋 Planned |
-| 02 | ArgoCD Basics | 📋 Planned |
-| **03** | **Setup & Installation** ← *current* | ✅ **Done** |
-| **04** | **First App Deployment** ← *current* | 🔄 **In Progress** |
+| 01 | Intro to GitOps & ArgoCD | ✅ Done |
+| 02 | ArgoCD Basics | ✅ Done |
+| 03 | Setup & Installation| ✅ Done |
+| 04 | First App Deployment | ✅ Done |
 | 05 | ArgoCD Features (Sync Waves, Hooks, Health) | 📋 Planned |
 | 06 | ArgoCD Notifications | 📋 Planned |
 | 07 | ArgoCD Image Updater | 📋 Planned |
