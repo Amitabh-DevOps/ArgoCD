@@ -41,7 +41,8 @@ ArgoCD/
 │   ├── package.json
 │   └── Dockerfile          # Multi-stage production build
 ├── kind-cluster.yaml       # KinD cluster config (1 control + 1 worker)
-├── argocd-setup.md         # Step-by-step ArgoCD setup guide
+├── argocd-setup.md         # Prerequisites install guide
+├── argocd-install.sh       # One-shot setup script (cluster → ArgoCD → CLI → cluster add)
 └── README.md
 ```
 
@@ -49,15 +50,30 @@ ArgoCD/
 
 ## 🛠️ Setup & Installation
 
-> Full step-by-step instructions are in **[argocd-setup.md](argocd-setup.md)**
+**Step 1 — Install prerequisites** → [prerequiste_install.md](prerequiste_install.md)  
+**Step 2 — Run the one-shot script** → [argocd-install.sh](argocd-install.sh)
 
-| Step | What you'll do |
-|------|----------------|
-| **1** | Install prerequisites — Docker, kubectl, kind |
-| **2** | Create the KinD cluster using `kind-cluster.yaml` |
-| **3** | Install ArgoCD, access the UI & get the initial password |
-| **4** | Install the ArgoCD CLI and login from your terminal |
-| **5** | Register your cluster with ArgoCD |
+```bash
+# On your EC2 instance, after installing prerequisites:
+git clone https://github.com/Amitabh-DevOps/ArgoCD.git
+cd ArgoCD
+chmod +x argocd-install.sh
+./argocd-install.sh
+```
+
+The script automates:
+
+| Step | Action |
+|------|--------|
+| 1 | Generate `kind-config.yaml` with EC2 private IP & API server port |
+| 2 | Create KinD cluster (1 control-plane + 2 workers) |
+| 3 | Prompt: choose **Helm** or **Manifest** install method |
+| 4 | Install ArgoCD in the `argocd` namespace |
+| 5 | Install the ArgoCD CLI (if not already present) |
+| 6 | Wait for `argocd-server` deployment to be Available |
+| 7 | Fetch & print initial admin password + access instructions |
+
+> ⚠️ Edit `CLUSTER_NAME` and the `apiServerAddress` (EC2 private IP) at the top of the script before running.
 
 ---
 
