@@ -39,7 +39,10 @@ ArgoCD/
 │   ├── public/             # Static frontend (HTML, CSS, JS)
 │   ├── server.js           # Express server
 │   ├── package.json
-│   └── Dockerfile          # Multi-stage production build
+│   ├── Dockerfile          # Multi-stage production build
+│   ├── deployment.yaml     # Kubernetes Deployment manifest
+│   └── service.yaml        # Kubernetes Service manifest (ClusterIP)
+├── argocd-app.yaml         # Declarative ArgoCD Application CRD
 ├── kind-cluster.yaml       # KinD cluster config (1 control + 1 worker)
 ├── argocd-setup.md         # Prerequisites install guide
 ├── argocd-install.sh       # One-shot setup script (cluster → ArgoCD → CLI → cluster add)
@@ -116,7 +119,47 @@ https://<kind-ip>:33893         argocd-cluster   v1.35    Successful
 
 ---
 
-## 🧪 Demo Application
+## 🚀 Deploy App via ArgoCD
+
+### Option A — ArgoCD CLI
+
+```bash
+argocd app create argocd-demo \
+  --repo https://github.com/Amitabh-DevOps/ArgoCD.git \
+  --path app \
+  --dest-server https://kubernetes.default.svc \
+  --dest-namespace default \
+  --sync-policy automated \
+  --auto-prune \
+  --self-heal
+```
+
+Verify and sync:
+```bash
+argocd app list
+argocd app get argocd-demo
+argocd app sync argocd-demo   # only needed if not using auto-sync
+```
+
+---
+
+### Option B — Declarative (GitOps way) ✅
+
+Apply the `Application` CRD manifest directly to the cluster:
+
+```bash
+kubectl apply -f argocd-app.yaml
+```
+
+ArgoCD will immediately pick it up and start syncing. Check status:
+```bash
+argocd app get argocd-demo
+kubectl get pods -n default
+kubectl get svc -n default
+```
+
+> 💡 The declarative approach is the **GitOps-native** way — the Application itself is stored in Git and applied once. From that point, every push to the `app/` path auto-syncs to the cluster.
+
 
 The `/app` directory contains a modern Node.js static web app that covers ArgoCD & GitOps concepts visually. Use it to demonstrate deployments throughout the course.
 
