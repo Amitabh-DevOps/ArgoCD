@@ -126,7 +126,7 @@ https://<kind-ip>:33893         argocd-cluster   v1.35    Successful
 ```bash
 argocd app create argocd-demo \
   --repo https://github.com/Amitabh-DevOps/ArgoCD.git \
-  --path app \
+  --path app/k8s \
   --dest-server https://kubernetes.default.svc \
   --dest-namespace default \
   --sync-policy automated \

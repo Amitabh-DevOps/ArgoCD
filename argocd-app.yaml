@@ -8,8 +8,8 @@ spec:
 
   source:
     repoURL: https://github.com/Amitabh-DevOps/ArgoCD.git
-    targetRevision: HEAD
-    path: app
+    targetRevision: master
+    path: app/k8s
 
   destination:
     server: https://kubernetes.default.svc
