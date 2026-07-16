@@ -5,11 +5,16 @@ metadata:
   namespace: argocd
 data:
   # ── Default policy for any user not explicitly mapped ─────────────────
+  # Any logged-in user not listed below gets read-only access
   policy.default: role:readonly
 
   # ── RBAC Policies ─────────────────────────────────────────────────────
-  # Format: p, <subject>, <resource>, <action>, <object>, <effect>
-  #         g, <user>,    <role>
+  # Format:
+  #   p, <subject>, <resource>, <action>, <object>, <effect>   ← define permissions
+  #   g, <user>,    <role>                                      ← assign user to role
+  #
+  # Project role reference format:
+  #   proj:<project-name>:<role-name>
   #
   # Built-in roles:
   #   role:admin    → full access to everything in ArgoCD
@@ -17,15 +22,20 @@ data:
 
   policy.csv: |
 
-    # ── Frontend team (alice) ─────────────────────────────────────────────
-    # alice can do everything on apps inside team-frontend project
-    p, alice, applications, *, team-frontend/*, allow
-    p, alice, logs,         get, team-frontend/*, allow
+    # ── alice → frontend-admin role ───────────────────────────────────────
+    # Assigns local user 'alice' to the 'frontend-admin' role defined in team-frontend AppProject
+    # That role already has: applications *, logs get — for team-frontend/* apps
+    g, alice, proj:team-frontend:frontend-admin
 
-    # ── Backend team (bob) ───────────────────────────────────────────────
-    # bob can do everything on apps inside team-backend project
-    p, bob, applications, *, team-backend/*, allow
-    p, bob, logs,         get, team-backend/*, allow
+    # ── bob → backend-admin role ──────────────────────────────────────────
+    # Assigns local user 'bob' to the 'backend-admin' role defined in team-backend AppProject
+    g, bob, proj:team-backend:backend-admin
 
-    # alice and bob can NOT touch each other's apps
-    # (no rule = deny by default)
+    # ── What this means ───────────────────────────────────────────────────
+    # alice: full access to team-frontend apps ONLY  (sync, get, delete, etc.)
+    # bob:   full access to team-backend apps ONLY
+    # anyone else: role:readonly (read-only, all apps)
+    #
+    # NOTE: When SSO is configured (future session), replace 'alice'/'bob'
+    # with GitHub org team names or LDAP groups using the 'groups:' field
+    # in AppProject or 'g, <group-name>, <role>' here.

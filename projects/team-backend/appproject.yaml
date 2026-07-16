@@ -36,17 +36,17 @@ spec:
       kind: ServiceAccount
 
   # ── RBAC roles scoped to this project ────────────────────────────────
+  # Note: 'groups' here is for SSO group mapping (covered in SSO session).
+  # For local users, mapping is done in argocd-rbac-cm.yaml using:
+  #   g, bob, proj:team-backend:backend-admin
   roles:
     - name: backend-admin
       description: Full access to backend project apps
       policies:
         - p, proj:team-backend:backend-admin, applications, *, team-backend/*, allow
-      groups:
-        - backend-admins
+        - p, proj:team-backend:backend-admin, logs, get, team-backend/*, allow
 
     - name: backend-readonly
       description: Read-only access to backend project
       policies:
         - p, proj:team-backend:backend-readonly, applications, get, team-backend/*, allow
-      groups:
-        - backend-developers

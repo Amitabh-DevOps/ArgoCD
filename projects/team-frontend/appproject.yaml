@@ -36,17 +36,17 @@ spec:
       kind: ServiceAccount
 
   # ── RBAC roles scoped to this project ────────────────────────────────
+  # Note: 'groups' here is for SSO group mapping (covered in SSO session).
+  # For local users, mapping is done in argocd-rbac-cm.yaml using:
+  #   g, alice, proj:team-frontend:frontend-admin
   roles:
     - name: frontend-admin
       description: Full access to frontend project apps
       policies:
         - p, proj:team-frontend:frontend-admin, applications, *, team-frontend/*, allow
-      groups:
-        - frontend-admins   # SSO group name (GitHub org team / LDAP group)
+        - p, proj:team-frontend:frontend-admin, logs, get, team-frontend/*, allow
 
     - name: frontend-readonly
       description: Read-only access to frontend project
       policies:
         - p, proj:team-frontend:frontend-readonly, applications, get, team-frontend/*, allow
-      groups:
-        - frontend-developers
