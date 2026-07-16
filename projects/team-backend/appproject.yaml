@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: team-backend
+  namespace: argocd
+  labels:
+    team: backend
+spec:
+  description: "Project for the Backend team — isolated to backend namespace and repo"
+
+  # ── Allowed source repositories ──────────────────────────────────────
+  sourceRepos:
+    - https://github.com/Amitabh-DevOps/ArgoCD.git
+
+  # ── Allowed destination clusters and namespaces ──────────────────────
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: backend
+
+  # ── Cluster resource allow list ──────────────────────────────────────
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+
+  # ── Namespace resource allow list ────────────────────────────────────
+  namespaceResourceWhitelist:
+    - group: "apps"
+      kind: Deployment
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Secret
+    - group: ""
+      kind: ServiceAccount
+
+  # ── RBAC roles scoped to this project ────────────────────────────────
+  roles:
+    - name: backend-admin
+      description: Full access to backend project apps
+      policies:
+        - p, proj:team-backend:backend-admin, applications, *, team-backend/*, allow
+      groups:
+        - backend-admins
+
+    - name: backend-readonly
+      description: Read-only access to backend project
+      policies:
+        - p, proj:team-backend:backend-readonly, applications, get, team-backend/*, allow
+      groups:
+        - backend-developers

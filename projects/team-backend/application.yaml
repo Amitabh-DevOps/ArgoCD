@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: backend-app
+  namespace: argocd
+  labels:
+    team: backend
+spec:
+  # ── Assign to the backend project ────────────────────────────────────
+  project: team-backend
+
+  source:
+    repoURL: https://github.com/Amitabh-DevOps/ArgoCD.git
+    targetRevision: HEAD
+    path: app
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backend              # must be in AppProject destinations list
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

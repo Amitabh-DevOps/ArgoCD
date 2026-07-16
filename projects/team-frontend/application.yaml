@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: frontend-app
+  namespace: argocd
+  labels:
+    team: frontend
+spec:
+  # ── Assign to the frontend project ───────────────────────────────────
+  project: team-frontend
+
+  source:
+    repoURL: https://github.com/Amitabh-DevOps/ArgoCD.git
+    targetRevision: HEAD
+    path: app
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: frontend             # must be in AppProject destinations list
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

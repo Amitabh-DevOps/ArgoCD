@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: team-frontend
+  namespace: argocd
+  labels:
+    team: frontend
+spec:
+  description: "Project for the Frontend team — isolated to frontend namespace and repo"
+
+  # ── Allowed source repositories ──────────────────────────────────────
+  sourceRepos:
+    - https://github.com/Amitabh-DevOps/ArgoCD.git
+
+  # ── Allowed destination clusters and namespaces ──────────────────────
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: frontend
+
+  # ── Cluster resource allow list (what cluster-scoped resources team can manage) ──
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+
+  # ── Namespace resource allow list ────────────────────────────────────
+  namespaceResourceWhitelist:
+    - group: "apps"
+      kind: Deployment
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Secret
+    - group: ""
+      kind: ServiceAccount
+
+  # ── RBAC roles scoped to this project ────────────────────────────────
+  roles:
+    - name: frontend-admin
+      description: Full access to frontend project apps
+      policies:
+        - p, proj:team-frontend:frontend-admin, applications, *, team-frontend/*, allow
+      groups:
+        - frontend-admins   # SSO group name (GitHub org team / LDAP group)
+
+    - name: frontend-readonly
+      description: Read-only access to frontend project
+      policies:
+        - p, proj:team-frontend:frontend-readonly, applications, get, team-frontend/*, allow
+      groups:
+        - frontend-developers
