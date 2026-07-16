@@ -50,7 +50,7 @@ kubectl apply -f sync-waves/argocd-app.yaml
 
 Watch resources come up in order:
 ```bash
-argocd app get argocd-sync-demo --watch
+argocd app wait argocd-sync-demo
 ```
 
 ---
