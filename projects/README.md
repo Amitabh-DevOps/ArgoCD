@@ -100,16 +100,76 @@ kubectl apply -f projects/team-backend/appproject.yaml
 kubectl apply -f projects/team-frontend/application.yaml
 kubectl apply -f projects/team-backend/application.yaml
 
-# 3. Apply RBAC
+# 3. Create local users (alice = frontend, bob = backend)
+kubectl apply -f projects/rbac/argocd-cm.yaml
+
+# 4. Apply RBAC policies
 kubectl apply -f projects/rbac/argocd-rbac-cm.yaml
+
+# 5. Set passwords for the new users (run on EC2)
+argocd account update-password --account alice --new-password Alice@1234 --current-password <admin-password>
+argocd account update-password --account bob   --new-password Bob@1234   --current-password <admin-password>
 ```
 
-Verify:
+Verify users exist:
+```bash
+argocd account list
+```
+
+Verify projects:
 ```bash
 argocd proj list
 argocd proj get team-frontend
 argocd proj get team-backend
 argocd app list
+```
+
+---
+
+## 🔐 Demo: Test RBAC (No SSO needed)
+
+> We use **local ArgoCD users** to demo RBAC. SSO (GitHub/Okta) will be covered in a later session.
+
+### Login as alice (frontend team)
+
+```bash
+argocd login <EC2_PUBLIC_IP>:8080 \
+  --username alice \
+  --password Alice@1234 \
+  --insecure
+```
+
+**alice CAN sync frontend-app:**
+```bash
+argocd app sync frontend-app    # ✅ works
+argocd app get  frontend-app    # ✅ works
+```
+
+**alice CANNOT touch backend-app:**
+```bash
+argocd app sync backend-app     # ❌ PermissionDenied
+argocd app get  backend-app     # ❌ PermissionDenied
+```
+
+---
+
+### Login as bob (backend team)
+
+```bash
+argocd login <EC2_PUBLIC_IP>:8080 \
+  --username bob \
+  --password Bob@1234 \
+  --insecure
+```
+
+**bob CAN sync backend-app:**
+```bash
+argocd app sync backend-app     # ✅ works
+```
+
+**bob CANNOT touch frontend-app:**
+```bash
+argocd app sync frontend-app    # ❌ PermissionDenied
 ```
 
 ---

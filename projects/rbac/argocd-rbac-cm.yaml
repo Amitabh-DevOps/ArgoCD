@@ -4,51 +4,28 @@ metadata:
   name: argocd-rbac-cm
   namespace: argocd
 data:
-  # ── Default policy for unauthenticated / unmatched users ─────────────
+  # ── Default policy for any user not explicitly mapped ─────────────────
   policy.default: role:readonly
 
-  # ── CSV-format RBAC policies ──────────────────────────────────────────
-  # Format:
-  #   p, <subject>, <resource>, <action>, <object>, <effect>
-  #   g, <user/group>, <role>
+  # ── RBAC Policies ─────────────────────────────────────────────────────
+  # Format: p, <subject>, <resource>, <action>, <object>, <effect>
+  #         g, <user>,    <role>
   #
   # Built-in roles:
-  #   role:admin    — full access to everything
-  #   role:readonly — read-only access to everything
-  #
-  # Custom roles below are scoped to specific projects.
+  #   role:admin    → full access to everything in ArgoCD
+  #   role:readonly → read-only access to everything
 
   policy.csv: |
 
-    # ── Global admin (ArgoCD super admin) ────────────────────────────────
-    g, argocd-admins, role:admin
+    # ── Frontend team (alice) ─────────────────────────────────────────────
+    # alice can do everything on apps inside team-frontend project
+    p, alice, applications, *, team-frontend/*, allow
+    p, alice, logs,         get, team-frontend/*, allow
 
-    # ── Frontend team ────────────────────────────────────────────────────
-    # Admin: can sync, create, delete apps in team-frontend project
-    p, role:frontend-admin, applications, *, team-frontend/*, allow
-    p, role:frontend-admin, repositories, get, *, allow
-    p, role:frontend-admin, logs, get, team-frontend/*, allow
+    # ── Backend team (bob) ───────────────────────────────────────────────
+    # bob can do everything on apps inside team-backend project
+    p, bob, applications, *, team-backend/*, allow
+    p, bob, logs,         get, team-backend/*, allow
 
-    # Read-only: can only view apps in team-frontend project
-    p, role:frontend-readonly, applications, get, team-frontend/*, allow
-
-    # Map SSO groups → roles
-    g, frontend-admins, role:frontend-admin
-    g, frontend-developers, role:frontend-readonly
-
-    # ── Backend team ─────────────────────────────────────────────────────
-    # Admin: can sync, create, delete apps in team-backend project
-    p, role:backend-admin, applications, *, team-backend/*, allow
-    p, role:backend-admin, repositories, get, *, allow
-    p, role:backend-admin, logs, get, team-backend/*, allow
-
-    # Read-only: can only view apps in team-backend project
-    p, role:backend-readonly, applications, get, team-backend/*, allow
-
-    # Map SSO groups → roles
-    g, backend-admins, role:backend-admin
-    g, backend-developers, role:backend-readonly
-
-  # ── SSO group claim key ───────────────────────────────────────────────
-  # Adjust based on your OIDC provider (GitHub = 'groups', Okta = 'groups', etc.)
-  scopes: '[groups, email]'
+    # alice and bob can NOT touch each other's apps
+    # (no rule = deny by default)

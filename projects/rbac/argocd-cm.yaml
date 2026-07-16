@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+data:
+  # ── Local users ───────────────────────────────────────────────────────
+  # These are additional accounts beyond the default 'admin' account.
+  # Format: accounts.<username>: apiKey, login
+  accounts.alice: login          # frontend team member
+  accounts.bob: login            # backend team member
