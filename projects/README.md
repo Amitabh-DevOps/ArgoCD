@@ -123,7 +123,7 @@ Try to create an app that **violates project rules** — ArgoCD will reject it:
 argocd app create bad-app \
   --project team-frontend \
   --repo https://github.com/Amitabh-DevOps/ArgoCD.git \
-  --path app \
+  --path app/k8s \
   --dest-server https://kubernetes.default.svc \
   --dest-namespace backend
 ```
