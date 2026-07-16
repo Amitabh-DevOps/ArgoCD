@@ -55,9 +55,9 @@ ArgoCD/
 │   ├── 02-deployment.yaml  # Wave  1
 │   ├── 03-service.yaml     # Wave  1
 │   ├── 04-post-sync-job.yaml  # Wave 2 + PostSync hook
-│   ├── argocd-app.yaml     # ArgoCD Application for this demo
 │   └── README.md           # Guide & video flow
-├── argocd-app.yaml         # Declarative ArgoCD Application CRD
+├── argocd-app.yaml         # Declarative ArgoCD Application CRD (Demo App)
+├── argocd-sync-app.yaml    # Declarative ArgoCD Application CRD (Sync Waves Demo)
 ├── kind-cluster.yaml       # KinD cluster config (1 control + 1 worker)
 ├── argocd-setup.md         # Prerequisites install guide
 ├── argocd-install.sh       # One-shot setup script (cluster → ArgoCD → CLI → cluster add)

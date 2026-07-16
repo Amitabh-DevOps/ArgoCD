@@ -36,8 +36,7 @@ sync-waves/
 ├── 01-configmap.yaml     # Wave  0 — app config
 ├── 02-deployment.yaml    # Wave  1 — app deployment
 ├── 03-service.yaml       # Wave  1 — app service
-├── 04-post-sync-job.yaml # Wave  2 + PostSync hook — verify after deploy
-└── argocd-app.yaml       # ArgoCD Application pointing to this directory
+└── 04-post-sync-job.yaml # Wave  2 + PostSync hook — verify after deploy
 ```
 
 ---
@@ -45,7 +44,7 @@ sync-waves/
 ## 🚀 Apply
 
 ```bash
-kubectl apply -f sync-waves/argocd-app.yaml
+kubectl apply -f argocd-sync-app.yaml
 ```
 
 Watch resources come up in order:
