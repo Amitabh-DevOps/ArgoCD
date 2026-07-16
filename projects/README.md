@@ -158,3 +158,47 @@ argocd proj role list team-frontend
 # Get role details and policies
 argocd proj role get team-frontend frontend-admin
 ```
+
+---
+
+## 🧹 Cleanup — Delete Project Resources
+
+> ⚠️ **Order matters** — always delete `Applications` before `AppProjects`.  
+> If you delete the project first, ArgoCD will error: *"application still belongs to project"*.
+
+### Option 1 — ArgoCD CLI
+
+```bash
+# 1. Delete Applications first
+argocd app delete frontend-app --yes
+argocd app delete backend-app --yes
+
+# 2. Then delete the AppProjects
+argocd proj delete team-frontend
+argocd proj delete team-backend
+```
+
+### Option 2 — kubectl
+
+```bash
+# 1. Delete Applications
+kubectl delete -f projects/team-frontend/application.yaml
+kubectl delete -f projects/team-backend/application.yaml
+
+# 2. Delete AppProjects
+kubectl delete -f projects/team-frontend/appproject.yaml
+kubectl delete -f projects/team-backend/appproject.yaml
+
+# 3. Delete RBAC config (optional)
+kubectl delete -f projects/rbac/argocd-rbac-cm.yaml
+```
+
+### Option 3 — Delete namespaces (full cleanup)
+
+```bash
+# Removes all deployed workloads inside the namespaces too
+kubectl delete namespace frontend
+kubectl delete namespace backend
+```
+
+> 💡 If `prune: true` is set in the Application's syncPolicy, deleting the Application will **automatically remove** the Deployment and Service from the cluster.
