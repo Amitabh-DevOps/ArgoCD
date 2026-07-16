@@ -17,7 +17,7 @@
 | 02 | ArgoCD Basics | ✅ Done |
 | 03 | Setup & Installation| ✅ Done |
 | 04 | First App Deployment | ✅ Done |
-| 05 | ArgoCD Features (Sync Waves, Hooks, Health) | 📋 Planned |
+| 05 | ArgoCD Projects (Multi-Team Isolation + RBAC) | ✅ Done |
 | 06 | ArgoCD Notifications | 📋 Planned |
 | 07 | ArgoCD Image Updater | 📋 Planned |
 | 08 | Monitoring the ArgoCD | 📋 Planned |
@@ -40,8 +40,14 @@ ArgoCD/
 │   ├── server.js           # Express server
 │   ├── package.json
 │   ├── Dockerfile          # Multi-stage production build
-│   ├── deployment.yaml     # Kubernetes Deployment manifest
-│   └── service.yaml        # Kubernetes Service manifest (ClusterIP)
+│   └── k8s/                # Kubernetes manifests
+│       ├── deployment.yaml # Kubernetes Deployment (2 replicas)
+│       └── service.yaml    # Kubernetes Service (ClusterIP, port 3000)
+├── projects/               # ArgoCD Projects demo (multi-team isolation + RBAC)
+│   ├── team-frontend/      # AppProject + Application for frontend team
+│   ├── team-backend/       # AppProject + Application for backend team
+│   ├── rbac/               # ArgoCD RBAC ConfigMap
+│   └── README.md           # Full Projects guide & CLI reference
 ├── argocd-app.yaml         # Declarative ArgoCD Application CRD
 ├── kind-cluster.yaml       # KinD cluster config (1 control + 1 worker)
 ├── argocd-setup.md         # Prerequisites install guide
