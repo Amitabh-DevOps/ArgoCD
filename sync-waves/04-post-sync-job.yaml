@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: post-sync-verify
+  namespace: wave-demo
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"          # ← deployed LAST (after Deployment is Healthy)
+    argocd.argoproj.io/hook: PostSync           # ← only runs after ALL resources are Healthy
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded  # ← auto-delete job after success
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: verify
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              echo "✅ PostSync hook running..."
+              echo "Checking if argocd-demo service is reachable..."
+              wget -qO- http://argocd-demo:3000 && echo "✅ App is UP!" || echo "❌ App not reachable"
+              echo "✅ Deployment verification complete."

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-demo
+  namespace: wave-demo
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"    # ← deployed THIRD (after ConfigMap)
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: argocd-demo
+  template:
+    metadata:
+      labels:
+        app: argocd-demo
+    spec:
+      containers:
+        - name: argocd-demo
+          image: amitabhdevops/argocd-demo:v1.0.0
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: app-config    # uses ConfigMap from wave 0
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-demo
+  namespace: wave-demo
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"    # ← same wave as Deployment (deployed together)
+spec:
+  type: ClusterIP
+  selector:
+    app: argocd-demo
+  ports:
+    - port: 3000
+      targetPort: 3000

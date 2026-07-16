@@ -17,7 +17,8 @@
 | 02 | ArgoCD Basics | ✅ Done |
 | 03 | Setup & Installation| ✅ Done |
 | 04 | First App Deployment | ✅ Done |
-| 05 | ArgoCD Projects (Multi-Team Isolation + RBAC) | ✅ Done |
+| 05 | ArgoCD Projects (Multi-Team Isolation + RBAC) | 📋 Planned |
+| **05.5** | **Sync Waves & Hooks** ← *current* | 🔄 **In Progress** |
 | 06 | ArgoCD Notifications | 📋 Planned |
 | 07 | ArgoCD Image Updater | 📋 Planned |
 | 08 | Monitoring the ArgoCD | 📋 Planned |
@@ -48,6 +49,14 @@ ArgoCD/
 │   ├── team-backend/       # AppProject + Application for backend team
 │   ├── rbac/               # ArgoCD RBAC ConfigMap
 │   └── README.md           # Full Projects guide & CLI reference
+├── sync-waves/             # Sync Waves & Hooks demo
+│   ├── 00-namespace.yaml   # Wave -1
+│   ├── 01-configmap.yaml   # Wave  0
+│   ├── 02-deployment.yaml  # Wave  1
+│   ├── 03-service.yaml     # Wave  1
+│   ├── 04-post-sync-job.yaml  # Wave 2 + PostSync hook
+│   ├── argocd-app.yaml     # ArgoCD Application for this demo
+│   └── README.md           # Guide & video flow
 ├── argocd-app.yaml         # Declarative ArgoCD Application CRD
 ├── kind-cluster.yaml       # KinD cluster config (1 control + 1 worker)
 ├── argocd-setup.md         # Prerequisites install guide
